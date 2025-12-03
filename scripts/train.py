@@ -19,7 +19,7 @@ from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from ssl_vision.data_loader import create_dataloader, get_transforms, SubmissionDataset, submission_collate_fn, get_eval_transforms
-from ssl_vision.models import create_dino_model, update_teacher, DINOLoss
+from ssl_vision.models import create_dino_model, update_teacher, DINOLoss,create_dinov3_model
 from ssl_vision.utils import get_cosine_schedule_with_warmup, AverageMeter, KNNClassifier, extract_features
 
 
@@ -31,8 +31,10 @@ def create_models(cfg: DictConfig, device: torch.device):
     """Create student and teacher models."""
     model_name = cfg.model.name
 
-    if model_name in ["dino_v2", "dino_v3"]:
+    if model_name == "dino_v2":
         student, teacher = create_dino_model(cfg)
+    elif model_name == "dino_v3":
+        student, teacher = create_dinov3_model(cfg)
     else:
         raise ValueError(f"Unknown model: {model_name}")
 

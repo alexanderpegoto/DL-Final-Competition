@@ -1,0 +1,37 @@
+model:
+  name: "dino_v3"
+
+  # ViT backbone (timm)
+  # For DINOv3 with ViT-S/14
+  architecture: "vit_small_patch14_224"
+
+  vit:
+    image_size: 224      # global crop size for the model
+    patch_size: 14
+    embed_dim: 384       # ViT-S/14 default
+    depth: 12
+    num_heads: 6
+    mlp_ratio: 4.0
+    drop_path_rate: 0.1
+
+  dino:
+    # Projection + output
+    out_dim: 65536           # standard DINO out_dim - code uses this for DINOLoss
+    hidden_dim: 2048         # MLP hidden size in DINOv3Head
+    bottleneck_dim: 256      # bottleneck before final linear
+    nlayers: 3               # number of MLP layers in DINOv3Head
+
+    # DINOv2 used a normed last layer; DINOv3-style head doesn’t need it
+    norm_last_layer: false
+
+    # Teacher temperature schedule
+    warmup_teacher_temp: 0.04
+    teacher_temp: 0.07
+    warmup_teacher_temp_epochs: 30   # adjust if you train very few epochs
+
+    # Student temperature
+    student_temp: 0.2
+
+    # EMA teacher momentum
+    momentum_teacher: 0.996
+    momentum_teacher_end: 1.0

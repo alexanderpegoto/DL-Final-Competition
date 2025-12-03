@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import timm
 
 
-class DINOHead(nn.Module):
+class DINOv3Head(nn.Module):
     """
     Projection head for DINO
     """
@@ -15,46 +15,27 @@ class DINOHead(nn.Module):
         self,
         in_dim: int,
         out_dim: int,
-        use_bn: bool = False,
-        norm_last_layer: bool = True,
         nlayers: int = 3,
         hidden_dim: int = 2048,
         bottleneck_dim: int = 256,
     ):
         super().__init__()
         nlayers = max(nlayers, 1)
-
-        if nlayers == 1:
-            self.mlp = nn.Linear(in_dim, bottleneck_dim)
-        else:
-            layers = [nn.Linear(in_dim, hidden_dim)]
-            if use_bn:
-                layers.append(nn.BatchNorm1d(hidden_dim))
+        
+        layers = []
+        dim_in = in_dim
+        dim_hidden = hidden_dim
+        
+        for i in range(nlayers -1):
+            layers.append(nn.Linear(dim_in,dim_hidden))
             layers.append(nn.GELU())
-
-            for _ in range(nlayers - 2):
-                layers.append(nn.Linear(hidden_dim, hidden_dim))
-                if use_bn:
-                    layers.append(nn.BatchNorm1d(hidden_dim))
-                layers.append(nn.GELU())
-
-            layers.append(nn.Linear(hidden_dim, bottleneck_dim))
-            self.mlp = nn.Sequential(*layers)
-
-        self.apply(self._init_weights)
-
-        self.last_layer = nn.utils.weight_norm(
-            nn.Linear(bottleneck_dim, out_dim, bias=False)
-        )
-        self.last_layer.weight_g.data.fill_(1)
-        if norm_last_layer:
-            self.last_layer.weight_g.requires_grad = False
-
-    def _init_weights(self, m):
-        if isinstance(m, nn.Linear):
-            nn.init.trunc_normal_(m.weight, std=0.02)
-            if m.bias is not None:
-                nn.init.constant_(m.bias, 0)
+            dim_in = dim_hidden
+        
+        layers.append(nn.Linear(dim_in, bottleneck_dim))
+        layers.append(nn.GELU())
+        
+        self.mlp = nn.Sequential(*layers)
+        self.fc = nn.Linear(bottleneck_dim, out_dim)
 
     def forward(self, x):
         # For DINO, we only use the CLS token (first token)
@@ -62,9 +43,10 @@ class DINOHead(nn.Module):
         if x.dim() == 3:
             x = x[:, 0]  # Extract CLS token
         x = self.mlp(x)
-        x = nn.functional.normalize(x, dim=-1, p=2)
-        x = self.last_layer(x)
-        return x
+        x = self.fc(x)
+        return F.normalize(x,dim=-1)
+    
+    
 
 
 class MultiCropWrapper(nn.Module):
@@ -176,7 +158,7 @@ def create_vision_transformer(cfg):
     return model
 
 
-def create_dino_model(cfg: DictConfig):
+def create_dinov3_model(cfg: DictConfig):
     """
     Create DINOv2 model (student and teacher)
     """
@@ -185,17 +167,20 @@ def create_dino_model(cfg: DictConfig):
     backbone_t = create_vision_transformer(cfg)
 
     # Create head (only for CLS token in pure DINO)
-    head_s = DINOHead(
+    head_s = DINOv3Head(
         in_dim=cfg.model.vit.embed_dim,
         out_dim=cfg.model.dino.out_dim,
-        norm_last_layer=cfg.model.dino.norm_last_layer,
+        hidden_dim=cfg.model.dino.hidden_dim,
         bottleneck_dim=cfg.model.dino.bottleneck_dim,
+        nlayers=cfg.model.dino.nlayers,
     )
-    head_t = DINOHead(
+
+    head_t = DINOv3Head(
         in_dim=cfg.model.vit.embed_dim,
         out_dim=cfg.model.dino.out_dim,
-        norm_last_layer=cfg.model.dino.norm_last_layer,
+        hidden_dim=cfg.model.dino.hidden_dim,
         bottleneck_dim=cfg.model.dino.bottleneck_dim,
+        nlayers=cfg.model.dino.nlayers,
     )
 
     # Wrap with multi-crop wrapper

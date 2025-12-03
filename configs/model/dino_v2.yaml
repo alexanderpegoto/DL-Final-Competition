@@ -1,7 +1,7 @@
 # @package _global_
 model:
-  name: dino_v2
-  architecture: vit_base_patch8_224  # actual image size will be overridden by data.image_size
+  name: dino_v3
+  architecture: vit_small_patch14_224  # actual image size will be overridden by data.image_size
 
   # Vision Transformer settings
   vit:
