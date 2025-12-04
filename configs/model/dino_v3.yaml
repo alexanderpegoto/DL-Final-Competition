@@ -15,7 +15,6 @@ vit:
   drop_path_rate: 0.1
 
 dino:
-  # Projection + output
   out_dim: 65536
   hidden_dim: 2048
   bottleneck_dim: 256
@@ -28,6 +27,11 @@ dino:
   warmup_teacher_temp_epochs: 30
   student_temp: 0.2
 
-  # EMA teacher momentum
+  # EMA teacher
   momentum_teacher: 0.996
   momentum_teacher_end: 1.0
+
+  # Multi-crop parameters (needed by get_transforms)
+  global_crops_scale: [0.4, 1.0]
+  local_crops_scale: [0.05, 0.4]
+  local_crops_number: 8
