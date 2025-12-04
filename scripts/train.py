@@ -590,7 +590,12 @@ def main(cfg: DictConfig):
     eval_transform = get_eval_transforms()
     eval_dataloaders = {}
 
-    eval_data_list = [eval_cfg.data[k] for k in sorted(eval_cfg.data.keys(), key=lambda x: int(x))]
+    eval_data_list = []
+    if "data" in eval_cfg and eval_cfg.data is not None:
+        eval_data_list = [
+            eval_cfg.data[k]
+            for k in sorted(eval_cfg.data.keys(), key=lambda x: int(x))
+        ]
 
     for idx, eval_data_cfg in enumerate(eval_data_list):
         dataset_name = eval_data_cfg.dataset_name
