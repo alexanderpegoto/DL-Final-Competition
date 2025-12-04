@@ -2,9 +2,9 @@
 # Default configuration
 defaults:
   - model: dino_v3  
-  - data@data.0: fall2025_deeplearning
-  - data@data.1: open_images
-  - data@data.2: na_birds
+  - data@data.0: fall2025_deeplearning   # only 500k base dataset
+  # - data@data.1: open_images           # disabled for now
+  # - data@data.2: na_birds              # disabled for now
   - optimizer: adamw
   - scheduler: cosine
   - evaluation/data@evaluation.data.0: cub200
