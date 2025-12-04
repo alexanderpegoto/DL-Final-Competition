@@ -19,7 +19,7 @@ from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from ssl_vision.data_loader import create_dataloader, get_transforms, SubmissionDataset, submission_collate_fn, get_eval_transforms
-from ssl_vision.models import create_dino_model, update_teacher, DINOLoss,create_dinov3_model
+from ssl_vision.models import update_teacher, DINOLoss,create_dinov3_model
 from ssl_vision.utils import get_cosine_schedule_with_warmup, AverageMeter, KNNClassifier, extract_features
 
 
