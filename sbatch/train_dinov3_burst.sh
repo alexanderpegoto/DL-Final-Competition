@@ -1,16 +1,13 @@
 #!/bin/bash
-#SBATCH --partition=a100_short     # check this exists on Burst (use `sinfo`)
-#SBATCH --nodes=1
-#SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=32
-#SBATCH --time=2-00:00:00
-#SBATCH --mem=256GB
+#SBATCH --account=csci_ga_2572-2025fa
+#SBATCH --partition=c24m170-a100-2
 #SBATCH --gres=gpu:2
-#SBATCH --job-name=train_gpu2
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=ap9283@nyu.edu   # <-- your email
+#SBATCH --time=24:00:00
+#SBATCH --job-name=train_dinov3
 #SBATCH --output="logs/%x/%j.out"
 #SBATCH --error="logs/%x/%j.err"
+#SBATCH --requeue
+#SBATCH --exclude=b-9-61
 
 TRAIN_EXP_ID=${SLURM_JOB_ID}
 
