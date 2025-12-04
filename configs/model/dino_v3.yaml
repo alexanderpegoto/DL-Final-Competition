@@ -3,11 +3,11 @@
 name: "dino_v3"
 
 # ViT backbone (timm)
-architecture: "vit_small_patch14_224"
+architecture: "vit_small_patch16_224"
 
 vit:
   image_size: 224
-  patch_size: 14
+  patch_size: 16
   embed_dim: 384       # ViT-S/14 default
   depth: 12
   num_heads: 6
