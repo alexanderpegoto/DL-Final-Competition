@@ -34,4 +34,4 @@ dino:
   # Multi-crop parameters (needed by get_transforms)
   global_crops_scale: [0.4, 1.0]
   local_crops_scale: [0.05, 0.4]
-  local_crops_number: 8
+  local_crops_number: 4

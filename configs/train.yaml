@@ -21,10 +21,10 @@ seed: 42
 # Training settings
 training:
   num_epochs: 250
-  batch_size: 128 # batch size per GPU (optimized for ViT-Small, 2 A100 GPUs)
-  num_workers: 8  # optimized for 2 multi-GPU trainnig (2 processes per GPU -> spawn 16 for each process -> total 32 worker processes)
+  batch_size: 16 # batch size per GPU (optimized for ViT-Small, 2 A100 GPUs)
+  num_workers: 4  # optimized for 2 multi-GPU trainnig (2 processes per GPU -> spawn 16 for each process -> total 32 worker processes)
   pin_memory: true
-  gradient_accumulation_steps: 1
+  gradient_accumulation_steps: 4
   mixed_precision: true
   gradient_clip: 3.0
   prefetch_factor: 2  # Prefetch more batches (2x default) to keep GPU fed
